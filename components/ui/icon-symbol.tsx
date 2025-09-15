@@ -18,6 +18,14 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  // Added mappings used across the app (especially Members page)
+  'message': 'message',
+  'checkmark': 'check',
+  'building.2.fill': 'business',
+  'location.fill': 'location-on',
+  'person.crop.circle.fill': 'account-circle',
+  'magnifyingglass': 'search',
+  'person.2.fill': 'people',
 } as IconMapping;
 
 /**

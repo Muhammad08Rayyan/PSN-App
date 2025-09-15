@@ -5,25 +5,52 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Official PSN Color Scheme from pakneurology.com
+const primaryTeal = '#01a89e'; // Main brand teal color
+const primaryOrange = '#f58020'; // Secondary brand orange
+const darkGray = '#4F5655'; // Text color
+const lightMintGreen = '#F3F6F3'; // Background accent
+const slateGray = '#4B4F58'; // Secondary text
+const lightGray = '#F6F7F8'; // Light background
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#010101',
+    textSecondary: darkGray,
+    background: '#FFFFFF',
+    backgroundSecondary: lightMintGreen,
+    tint: primaryTeal,
+    primary: primaryTeal,
+    secondary: slateGray,
+    accent: primaryOrange,
+    success: '#00AA44',
+    warning: primaryOrange,
+    error: '#DD3333',
+    icon: darkGray,
+    tabIconDefault: '#8E8E93',
+    tabIconSelected: primaryTeal,
+    border: '#E1E5E9',
+    card: '#FFFFFF',
+    notification: primaryOrange,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#FFFFFF',
+    textSecondary: '#B0B0B0',
+    background: '#000000',
+    backgroundSecondary: '#1C1C1E',
+    tint: '#1CBBB2', // Lighter teal for dark mode
+    primary: '#1CBBB2',
+    secondary: '#8E8E93',
+    accent: '#FF9A4D', // Lighter orange for dark mode
+    success: '#2ECC71',
+    warning: '#F1C40F',
+    error: '#E67E22',
+    icon: '#8E8E93',
+    tabIconDefault: '#8E8E93',
+    tabIconSelected: '#1CBBB2',
+    border: '#38383A',
+    card: '#1C1C1E',
+    notification: '#FF9A4D',
   },
 };
 
