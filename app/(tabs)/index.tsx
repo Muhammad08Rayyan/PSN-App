@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollView, StyleSheet, RefreshControl, TouchableOpacity, Alert, ActivityIndicator, Dimensions, StatusBar, Share, Modal, TextInput, FlatList } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
-import { apiGet, apiPost } from '@/utils/api';
+import { apiGet, apiPost, makeFetchRequest } from '@/utils/api';
 import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
@@ -49,6 +50,11 @@ export default function FeedScreen() {
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [postingComment, setPostingComment] = useState(false);
+  const [createPostExpanded, setCreatePostExpanded] = useState(false);
+  const [newPostContent, setNewPostContent] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [postingNewPost, setPostingNewPost] = useState(false);
+  const [imagePickerVisible, setImagePickerVisible] = useState(false);
   const { getAuthHeaders, user } = useAuth();
   const router = useRouter();
 
@@ -239,6 +245,105 @@ export default function FeedScreen() {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
+  const handleImageSelection = () => {
+    setImagePickerVisible(true);
+  };
+
+  const selectFromGallery = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert('Permission Required', 'Please allow access to your photo library to select images.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+    setImagePickerVisible(false);
+  };
+
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert('Permission Required', 'Please allow access to your camera to take photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: false,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+    setImagePickerVisible(false);
+  };
+
+  const createNewPost = async () => {
+    if (!newPostContent.trim()) {
+      Alert.alert('Error', 'Please enter some content for your post.');
+      return;
+    }
+
+    setPostingNewPost(true);
+    try {
+      if (selectedImage) {
+        // Create post with image using FormData (same as profile pic upload)
+        const formData = new FormData();
+        formData.append('content', newPostContent.trim());
+        formData.append('image', {
+          uri: selectedImage,
+          type: 'image/jpeg',
+          name: 'post-image.jpg',
+        } as any);
+
+        const response = await makeFetchRequest('/posts', {
+          method: 'POST',
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        // Create text-only post using regular API call
+        await apiPost('/posts', {
+          content: newPostContent.trim()
+        }, {
+          headers: getAuthHeaders(),
+        });
+      }
+
+      // Clear form
+      setNewPostContent('');
+      setSelectedImage(null);
+      setCreatePostExpanded(false);
+
+      // Refresh feed
+      fetchFeed();
+
+      Alert.alert('Success', 'Your post has been created successfully!');
+    } catch (error) {
+      console.error('Error creating post:', error);
+      Alert.alert('Error', 'Failed to create post. Please try again.');
+    } finally {
+      setPostingNewPost(false);
+    }
+  };
+
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: backgroundSecondary }]}>
@@ -275,6 +380,130 @@ export default function FeedScreen() {
           />
         }
       >
+        {/* Create Post Section */}
+        <ThemedView style={[styles.createPostCard, { backgroundColor: cardBackground }]}>
+          {!createPostExpanded ? (
+            <TouchableOpacity
+              style={styles.createPostPrompt}
+              onPress={() => setCreatePostExpanded(true)}
+            >
+              <ThemedView style={styles.createPostHeader}>
+                {user?.profilePic ? (
+                  <Image
+                    source={{ uri: user.profilePic }}
+                    style={styles.userProfileImage}
+                    placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
+                    transition={200}
+                  />
+                ) : (
+                  <ThemedView style={[styles.userProfilePlaceholder, { backgroundColor: tintColor }]}>
+                    <Ionicons name="person" size={20} color="white" />
+                  </ThemedView>
+                )}
+                <ThemedText style={[styles.createPostText, { color: textSecondary }]}>
+                  What&apos;s on your mind, {user?.name?.split(' ')[0] || 'User'}?
+                </ThemedText>
+              </ThemedView>
+              <ThemedView style={styles.createPostActions}>
+                <TouchableOpacity style={[styles.createActionButton, { backgroundColor: backgroundColor }]}>
+                  <Ionicons name="image" size={20} color={tintColor} />
+                  <ThemedText style={[styles.createActionText, { color: tintColor }]}>Photo</ThemedText>
+                </TouchableOpacity>
+              </ThemedView>
+            </TouchableOpacity>
+          ) : (
+            <ThemedView style={styles.createPostForm}>
+              <ThemedView style={styles.createPostHeader}>
+                {user?.profilePic ? (
+                  <Image
+                    source={{ uri: user.profilePic }}
+                    style={styles.userProfileImage}
+                    placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
+                    transition={200}
+                  />
+                ) : (
+                  <ThemedView style={[styles.userProfilePlaceholder, { backgroundColor: tintColor }]}>
+                    <Ionicons name="person" size={20} color="white" />
+                  </ThemedView>
+                )}
+                <ThemedView style={styles.createPostUserInfo}>
+                  <ThemedText type="defaultSemiBold">{user?.name || 'User'}</ThemedText>
+                  <ThemedText style={[styles.postingAsText, { color: textSecondary }]}>Posting to PSN Community</ThemedText>
+                </ThemedView>
+              </ThemedView>
+
+              <TextInput
+                style={[styles.contentInput, { backgroundColor: backgroundColor, color: textColor }]}
+                placeholder={`What's on your mind, ${user?.name?.split(' ')[0] || 'User'}?`}
+                placeholderTextColor={textSecondary}
+                value={newPostContent}
+                onChangeText={setNewPostContent}
+                multiline
+                textAlignVertical="top"
+                maxLength={1000}
+                autoFocus
+              />
+
+              {selectedImage && (
+                <ThemedView style={styles.selectedImageContainer}>
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={styles.selectedImage}
+                    placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
+                    transition={200}
+                  />
+                  <TouchableOpacity
+                    style={[styles.removeImageButton, { backgroundColor: 'rgba(0,0,0,0.7)' }]}
+                    onPress={() => setSelectedImage(null)}
+                  >
+                    <Ionicons name="close" size={16} color="white" />
+                  </TouchableOpacity>
+                </ThemedView>
+              )}
+
+              <ThemedView style={styles.createPostFormActions}>
+                <TouchableOpacity
+                  style={[styles.createFormActionButton, { backgroundColor: backgroundColor }]}
+                  onPress={handleImageSelection}
+                >
+                  <Ionicons name="image" size={20} color={tintColor} />
+                  <ThemedText style={[styles.createFormActionText, { color: tintColor }]}>Photo</ThemedText>
+                </TouchableOpacity>
+
+                <ThemedView style={styles.createPostButtons}>
+                  <TouchableOpacity
+                    style={[styles.cancelButton, { backgroundColor: backgroundColor }]}
+                    onPress={() => {
+                      setCreatePostExpanded(false);
+                      setNewPostContent('');
+                      setSelectedImage(null);
+                    }}
+                  >
+                    <ThemedText style={[styles.cancelButtonText, { color: iconColor }]}>Cancel</ThemedText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.postButton,
+                      {
+                        backgroundColor: newPostContent.trim() ? tintColor : textSecondary,
+                        opacity: newPostContent.trim() ? 1 : 0.5
+                      }
+                    ]}
+                    onPress={createNewPost}
+                    disabled={postingNewPost || !newPostContent.trim()}
+                  >
+                    {postingNewPost ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <ThemedText style={styles.postButtonText}>Post</ThemedText>
+                    )}
+                  </TouchableOpacity>
+                </ThemedView>
+              </ThemedView>
+            </ThemedView>
+          )}
+        </ThemedView>
         {posts.length === 0 && !loading ? (
           <ThemedView style={styles.emptyState}>
             <ThemedView style={[styles.emptyIcon, { backgroundColor: tintColor + '20' }]}>
@@ -384,6 +613,67 @@ export default function FeedScreen() {
           })
         )}
       </ScrollView>
+
+      {/* Image Picker Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={imagePickerVisible}
+        onRequestClose={() => setImagePickerVisible(false)}
+      >
+        <ThemedView style={styles.imagePickerOverlay}>
+          <ThemedView style={[styles.imagePickerContainer, { backgroundColor: backgroundColor }]}>
+            {/* Handle Bar */}
+            <ThemedView style={[styles.handleBar, { backgroundColor: borderColor }]} />
+
+            {/* Header */}
+            <ThemedView style={[styles.imagePickerHeader, { borderBottomColor: borderColor }]}>
+              <ThemedText style={[styles.imagePickerTitle, { color: textColor }]}>Add Photo</ThemedText>
+              <TouchableOpacity
+                onPress={() => setImagePickerVisible(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color={iconColor} />
+              </TouchableOpacity>
+            </ThemedView>
+
+            {/* Options */}
+            <ThemedView style={styles.imagePickerOptions}>
+              <TouchableOpacity
+                style={[styles.imagePickerOption, { backgroundColor: backgroundColor }]}
+                onPress={takePhoto}
+              >
+                <ThemedView style={[styles.imagePickerIconContainer, { backgroundColor: '#4CAF50' + '20' }]}>
+                  <Ionicons name="camera" size={28} color="#4CAF50" />
+                </ThemedView>
+                <ThemedView style={styles.imagePickerOptionText}>
+                  <ThemedText type="defaultSemiBold" style={styles.imagePickerOptionTitle}>Camera</ThemedText>
+                  <ThemedText style={[styles.imagePickerOptionSubtitle, { color: textSecondary }]}>
+                    Take a new photo
+                  </ThemedText>
+                </ThemedView>
+                <Ionicons name="chevron-forward" size={20} color={textSecondary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.imagePickerOption, { backgroundColor: backgroundColor }]}
+                onPress={selectFromGallery}
+              >
+                <ThemedView style={[styles.imagePickerIconContainer, { backgroundColor: '#2196F3' + '20' }]}>
+                  <Ionicons name="images" size={28} color="#2196F3" />
+                </ThemedView>
+                <ThemedView style={styles.imagePickerOptionText}>
+                  <ThemedText type="defaultSemiBold" style={styles.imagePickerOptionTitle}>Gallery</ThemedText>
+                  <ThemedText style={[styles.imagePickerOptionSubtitle, { color: textSecondary }]}>
+                    Choose from your photos
+                  </ThemedText>
+                </ThemedView>
+                <Ionicons name="chevron-forward" size={20} color={textSecondary} />
+              </TouchableOpacity>
+            </ThemedView>
+          </ThemedView>
+        </ThemedView>
+      </Modal>
 
       {/* Comments Modal */}
       <Modal
@@ -804,5 +1094,213 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  // Create Post Styles
+  createPostCard: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  createPostPrompt: {
+    padding: 16,
+  },
+  createPostHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  userProfileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+  },
+  userProfilePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createPostText: {
+    marginLeft: 12,
+    fontSize: 16,
+    flex: 1,
+  },
+  createPostActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  createActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  createActionText: {
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  createPostForm: {
+    padding: 16,
+  },
+  createPostUserInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  postingAsText: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  titleInput: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  contentInput: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    fontSize: 15,
+    minHeight: 100,
+    maxHeight: 200,
+  },
+  selectedImageContainer: {
+    marginTop: 12,
+    position: 'relative',
+  },
+  selectedImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createPostFormActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  createFormActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  createFormActionText: {
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  createPostButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  cancelButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  postButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Image Picker Modal Styles
+  imagePickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  imagePickerContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 40,
+    maxHeight: '40%',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 25,
+  },
+  imagePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  imagePickerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  imagePickerOptions: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    gap: 12,
+  },
+  imagePickerOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  imagePickerIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  imagePickerOptionText: {
+    flex: 1,
+  },
+  imagePickerOptionTitle: {
+    fontSize: 16,
+    marginBottom: 2,
+  },
+  imagePickerOptionSubtitle: {
+    fontSize: 14,
   },
 });

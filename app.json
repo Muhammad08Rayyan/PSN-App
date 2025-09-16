@@ -4,7 +4,7 @@
     "slug": "PSN",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/psn-logo.png",
     "scheme": "psn",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,9 +14,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/psn-logo.png",
+        "backgroundImage": "./assets/images/psn-logo.png",
+        "monochromeImage": "./assets/images/psn-logo.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -31,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/psn-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -45,11 +45,10 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "owner": "rayyan_kashif",
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "87a8aef8-7398-47e1-893e-1275bd96a78d"
+        "projectId": "1b1f9481-0bb5-4c59-a7a2-c208284e72e9"
       }
     }
   }

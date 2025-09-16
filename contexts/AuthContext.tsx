@@ -60,15 +60,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (token && userData) {
         setToken(token);
         try {
-          // Try to verify token with backend
           const response = await apiGet('/auth/profile', {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUser(response.data);
         } catch (error) {
-          // If backend is unreachable or token expired, use stored data
-          // Token persists forever unless manually removed
-          console.log('Backend unreachable, using stored user data');
           setUser(JSON.parse(userData));
         }
       }
