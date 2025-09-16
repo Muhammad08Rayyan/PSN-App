@@ -1,11 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
-
-const { height: screenHeight } = Dimensions.get('window');
 
 export default function PresidentsMessageScreen() {
   return (
@@ -15,7 +12,7 @@ export default function PresidentsMessageScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backArrow}>‹</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>President's Message</Text>
+        <Text style={styles.headerTitle}>President&apos;s Message</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -34,7 +31,7 @@ export default function PresidentsMessageScreen() {
           </View>
         </View>
 
-        <Text style={styles.title}>President's Message</Text>
+        <Text style={styles.title}>President&apos;s Message</Text>
         <Text style={styles.subtitle}>Professor Naila N. Shahbaz - President, PSN</Text>
 
         <View style={styles.contentCard}>
@@ -49,7 +46,7 @@ export default function PresidentsMessageScreen() {
             {'\n\n'}
             This mobile application represents our commitment to embracing technology to better serve our members. Here, you will find opportunities for professional networking, access to latest research, educational resources, and updates on our events and initiatives.
             {'\n\n'}
-            I encourage you to actively participate in our society's activities and contribute to the advancement of neurological sciences in Pakistan. Together, we can achieve remarkable milestones in neurology and make a lasting impact on healthcare in our beloved country.
+            I encourage you to actively participate in our society&apos;s activities and contribute to the advancement of neurological sciences in Pakistan. Together, we can achieve remarkable milestones in neurology and make a lasting impact on healthcare in our beloved country.
             {'\n\n'}
             With warm regards and best wishes for your continued success.
           </Text>

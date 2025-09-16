@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   Image,
   Alert,
   ActionSheetIOS,
@@ -13,13 +12,9 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { API_BASE_URL } from '@/utils/api-config';
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
 const menuItems = [
   { title: "President's Message", screen: '/presidents-message' },
@@ -112,7 +107,7 @@ export default function ProfileScreen() {
       if (!result.canceled && result.assets[0]) {
         await uploadProfileImage(result.assets[0].uri);
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to pick image');
     }
   };
@@ -127,7 +122,7 @@ export default function ProfileScreen() {
       } else {
         Alert.alert('Error', result.message || 'Failed to update profile picture');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to upload image');
     } finally {
       setIsUpdatingImage(false);
@@ -144,28 +139,13 @@ export default function ProfileScreen() {
       } else {
         Alert.alert('Error', result.message || 'Failed to delete profile picture');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to delete profile picture');
     } finally {
       setIsUpdatingImage(false);
     }
   };
 
-  const formatDate = (dateString: string | { $date: { $numberLong: string } }) => {
-    try {
-      let date: Date;
-      if (typeof dateString === 'string') {
-        date = new Date(dateString);
-      } else if (dateString?.$date?.$numberLong) {
-        date = new Date(parseInt(dateString.$date.$numberLong));
-      } else {
-        return 'Not provided';
-      }
-      return date.toLocaleDateString();
-    } catch {
-      return 'Not provided';
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>

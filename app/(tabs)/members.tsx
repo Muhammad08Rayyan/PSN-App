@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Dimensions,
   FlatList,
   ActivityIndicator,
-  Alert,
   RefreshControl,
   Image,
 } from 'react-native';
@@ -49,21 +47,14 @@ export default function MembersScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMoreData, setHasMoreData] = useState(true);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-
   const backgroundColor = useThemeColor({}, 'background');
-  const backgroundSecondary = useThemeColor({}, 'backgroundSecondary');
-  const cardBackground = useThemeColor({}, 'card');
   const textSecondary = useThemeColor({}, 'textSecondary');
   const accent = useThemeColor({}, 'accent');
   const primary = useThemeColor({}, 'primary');
-  const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({}, 'border');
-  const iconColor = useThemeColor({}, 'icon');
 
 
-  const loadMembers = async (pageNum = 1, isLoadMore = false) => {
+  const loadMembers = useCallback(async (pageNum = 1, isLoadMore = false) => {
     if (isLoadMore) {
       setLoadingMore(true);
     } else {
@@ -133,7 +124,7 @@ export default function MembersScreen() {
         setLoading(false);
       }
     }
-  };
+  }, [getAuthHeaders]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -158,7 +149,7 @@ export default function MembersScreen() {
     );
   };
 
-  const searchMembers = async (query: string) => {
+  const searchMembers = useCallback(async (query: string) => {
     if (!query.trim()) {
       // Reset to current loaded members when search is cleared
       setFilteredMembers(members);
@@ -187,19 +178,19 @@ export default function MembersScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAuthHeaders, members]);
 
 
   useEffect(() => {
     loadMembers();
-  }, []);
+  }, [loadMembers]);
 
   // Ensure filteredMembers is updated when members change
   useEffect(() => {
     if (members.length > 0 && !searchQuery.trim()) {
       setFilteredMembers(members);
     }
-  }, [members]);
+  }, [members, searchQuery]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -207,7 +198,7 @@ export default function MembersScreen() {
     }, 300); // Debounce search by 300ms
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, searchMembers]);
 
   const handleContactMember = (member: Member) => {
     // Navigate to chat page with member info

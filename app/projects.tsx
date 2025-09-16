@@ -37,7 +37,7 @@ export default function ProjectsScreen() {
           </View>
 
           <Text style={styles.message}>
-            Discover PSN's ongoing projects and initiatives transforming neurological care in Pakistan.
+            Discover PSN&apos;s ongoing projects and initiatives transforming neurological care in Pakistan.
             {'\n\n'}
             Our projects include:
             {'\n'}• Healthcare improvement initiatives
@@ -47,7 +47,7 @@ export default function ProjectsScreen() {
             {'\n'}• Technology integration
             {'\n'}• International partnerships
             {'\n\n'}
-            Together, we're building a stronger neurological healthcare system.
+            Together, we&apos;re building a stronger neurological healthcare system.
           </Text>
         </View>
 

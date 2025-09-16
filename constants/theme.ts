@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
 
 // Official PSN Color Scheme from pakneurology.com
 const primaryTeal = '#01a89e'; // Main brand teal color
-const primaryOrange = '#f58020'; // Secondary brand orange
+const primaryOrange = '#01a89e'; // Secondary brand orange
 const darkGray = '#4F5655'; // Text color
 const lightMintGreen = '#F3F6F3'; // Background accent
 const slateGray = '#4B4F58'; // Secondary text

@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
 
 const handleBack = () => {
@@ -62,7 +61,7 @@ export default function TermsConditionsScreen() {
           <Text style={styles.subheading}>Usage guidelines:</Text>
           <View style={styles.listContainer}>
             <Text style={styles.listItem}>• Use the app for professional purposes only</Text>
-            <Text style={styles.listItem}>• Respect other members' privacy and professional dignity</Text>
+            <Text style={styles.listItem}>• Respect other members&apos; privacy and professional dignity</Text>
             <Text style={styles.listItem}>• Not share inappropriate or offensive content</Text>
             <Text style={styles.listItem}>• Maintain confidentiality of patient information</Text>
             <Text style={styles.listItem}>• Report any misuse or violations to PSN administrators</Text>
@@ -97,7 +96,7 @@ export default function TermsConditionsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Limitation of Liability</Text>
           <Text style={styles.text}>
-            PSN provides services "as is" without warranties. We are not liable for any indirect, incidental,
+            PSN provides services &quot;as is&quot; without warranties. We are not liable for any indirect, incidental,
             or consequential damages arising from the use of our services. Medical decisions should always be
             based on professional judgment and not solely on information from PSN platforms.
           </Text>

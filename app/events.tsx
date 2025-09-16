@@ -28,7 +28,7 @@ export default function EventsScreen() {
         </View>
 
         <Text style={styles.title}>Events & Conferences</Text>
-        <Text style={styles.subtitle}>Stay updated with PSN's latest events</Text>
+        <Text style={styles.subtitle}>Stay updated with PSN&apos;s latest events</Text>
 
         <View style={styles.contentCard}>
           <View style={styles.statusBadge}>

@@ -55,7 +55,7 @@ export default function VerifyResetCodeScreen() {
       } else {
         Alert.alert('Error', 'Invalid or expired verification code');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -82,7 +82,7 @@ export default function VerifyResetCodeScreen() {
           <View style={styles.content}>
             <ThemedText type="title" style={styles.title}>Verify Code</ThemedText>
             <ThemedText style={styles.subtitle}>
-              We've sent a 6-digit verification code to{'\n'}
+              We&apos;ve sent a 6-digit verification code to{'\n'}
               <ThemedText style={[styles.emailText, { color: primary }]}>{email}</ThemedText>
             </ThemedText>
 
@@ -120,7 +120,7 @@ export default function VerifyResetCodeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleResendCode} style={styles.resendButton}>
-              <ThemedText style={[styles.resendText, { color: primary }]}>Didn't receive code? Resend</ThemedText>
+              <ThemedText style={[styles.resendText, { color: primary }]}>Didn&apos;t receive code? Resend</ThemedText>
             </TouchableOpacity>
           </View>
         </ScrollView>

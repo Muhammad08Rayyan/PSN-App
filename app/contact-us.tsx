@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
 
 const handleEmailPress = () => {
@@ -40,7 +39,7 @@ export default function ContactUsScreen() {
         {/* Introduction */}
         <View style={styles.section}>
           <Text style={styles.introText}>
-            We'd love to hear from you. Contact the Pakistan Society of Neurology for any inquiries,
+            We&apos;d love to hear from you. Contact the Pakistan Society of Neurology for any inquiries,
             membership information, or collaboration opportunities.
           </Text>
         </View>

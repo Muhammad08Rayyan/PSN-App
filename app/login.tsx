@@ -11,7 +11,6 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { ThemedText } from '@/components/themed-text';
@@ -45,7 +44,7 @@ export default function LoginScreen() {
       } else {
         Alert.alert('Error', 'Invalid email or password');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);

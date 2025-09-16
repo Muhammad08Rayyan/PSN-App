@@ -63,7 +63,7 @@ export default function NewPasswordScreen() {
       } else {
         Alert.alert('Error', 'Failed to reset password. Please try again.');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);

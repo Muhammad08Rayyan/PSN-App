@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 interface PlusOverlayProps {
   visible: boolean;
@@ -53,9 +53,8 @@ export default function PlusOverlay({ visible, onClose }: PlusOverlayProps) {
         })
       ]).start();
     }
-  }, [visible]);
+  }, [visible, overlayOpacity, slideAnim]);
 
-  const backgroundColor = useThemeColor({}, 'background');
   const cardBackground = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
   const tintColor = useThemeColor({}, 'tint');

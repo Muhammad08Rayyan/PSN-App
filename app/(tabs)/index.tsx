@@ -110,7 +110,7 @@ export default function FeedScreen() {
 
   const handleLike = async (postId: string) => {
     try {
-      const response = await apiPost(`/posts/${postId}/like`, {}, {
+      await apiPost(`/posts/${postId}/like`, {}, {
         headers: getAuthHeaders(),
       });
 
@@ -154,7 +154,7 @@ export default function FeedScreen() {
 
     setPostingComment(true);
     try {
-      const response = await apiPost(`/posts/${selectedPostId}/comments`, {
+      await apiPost(`/posts/${selectedPostId}/comments`, {
         content: newComment.trim()
       }, {
         headers: getAuthHeaders(),
@@ -417,7 +417,7 @@ export default function FeedScreen() {
                 loadingComments ? (
                   <ThemedView style={styles.loadingComments}>
                     <ActivityIndicator size="small" color={tintColor} />
-                    <ThemedText style={[styles.loadingText, { color: textSecondary }]}>
+                    <ThemedText style={[styles.loadingCommentsText, { color: textSecondary }]}>
                       Loading comments...
                     </ThemedText>
                   </ThemedView>
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
-  loadingText: {
+  loadingCommentsText: {
     marginTop: 10,
     fontSize: 14,
   },

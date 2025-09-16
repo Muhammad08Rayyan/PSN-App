@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAuth } from '@/contexts/AuthContext';
 import { API_BASE_URL } from '@/utils/api-config';
@@ -42,16 +41,15 @@ export default function NewsDetailScreen() {
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
   const primary = useThemeColor({}, 'primary');
-  const cardBackground = useThemeColor({}, 'cardBackground');
 
   // Fetch news article details
   useEffect(() => {
     if (newsId) {
       fetchNewsDetail();
     }
-  }, [newsId]);
+  }, [newsId, fetchNewsDetail]);
 
-  const fetchNewsDetail = async () => {
+  const fetchNewsDetail = useCallback(async () => {
     try {
       const headers = await getAuthHeaders();
       const response = await axios.get(`${API_BASE_URL}/news/${newsId}`, {
@@ -67,7 +65,7 @@ export default function NewsDetailScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAuthHeaders, newsId]);
 
   const handleShare = async () => {
     if (!article) return;

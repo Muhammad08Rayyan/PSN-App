@@ -37,7 +37,7 @@ export default function ResearchScreen() {
           </View>
 
           <Text style={styles.message}>
-            Explore PSN's contributions to neurological research and scientific literature.
+            Explore PSN&apos;s contributions to neurological research and scientific literature.
             {'\n\n'}
             This section will feature:
             {'\n'}• Published research papers

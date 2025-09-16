@@ -47,7 +47,7 @@ export default function ForgotPasswordScreen() {
       } else {
         Alert.alert('Error', result.message || 'Failed to send reset code');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -79,7 +79,7 @@ export default function ForgotPasswordScreen() {
           <View style={styles.content}>
             <ThemedText type="title" style={styles.title}>Forgot Password</ThemedText>
             <ThemedText style={styles.subtitle}>
-              Enter your email address and we'll send you a verification code to reset your password.
+              Enter your email address and we&apos;ll send you a verification code to reset your password.
             </ThemedText>
 
             <View style={styles.inputContainer}>
